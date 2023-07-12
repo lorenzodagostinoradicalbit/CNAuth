@@ -1,0 +1,12 @@
+apiVersion: keys.cnauth/v1alpha1
+kind: JWTKey
+metadata:
+  labels:
+    app.kubernetes.io/name: jwtkey
+    app.kubernetes.io/instance: jwtkey-sample
+    app.kubernetes.io/part-of: auth-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: auth-operator
+  name: jwtkey-sample
+spec:
+  # TODO(user): Add fields here

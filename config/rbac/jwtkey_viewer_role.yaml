@@ -1,0 +1,27 @@
+# permissions for end users to view jwtkeys.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: jwtkey-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: auth-operator
+    app.kubernetes.io/part-of: auth-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: jwtkey-viewer-role
+rules:
+- apiGroups:
+  - keys.cnauth
+  resources:
+  - jwtkeys
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - keys.cnauth
+  resources:
+  - jwtkeys/status
+  verbs:
+  - get

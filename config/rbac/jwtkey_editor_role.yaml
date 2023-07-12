@@ -1,0 +1,31 @@
+# permissions for end users to edit jwtkeys.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: jwtkey-editor-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: auth-operator
+    app.kubernetes.io/part-of: auth-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: jwtkey-editor-role
+rules:
+- apiGroups:
+  - keys.cnauth
+  resources:
+  - jwtkeys
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - keys.cnauth
+  resources:
+  - jwtkeys/status
+  verbs:
+  - get

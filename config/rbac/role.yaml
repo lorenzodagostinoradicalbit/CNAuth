@@ -1,0 +1,59 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - keys.cnauth
+  resources:
+  - jwtkeys
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - keys.cnauth
+  resources:
+  - jwtkeys/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - keys.cnauth
+  resources:
+  - jwtkeys/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - keys.cnauth
+  resources:
+  - users
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - keys.cnauth
+  resources:
+  - users/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - keys.cnauth
+  resources:
+  - users/status
+  verbs:
+  - get
+  - patch
+  - update
