@@ -29,7 +29,7 @@ type UserSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// Foo is an example field of User. Edit user_types.go to remove/update
-	Name     string `json:"name,omitempty"`
+	Name     string `json:"username,omitempty"`
 	Password string `json:"password,omitempty"`
 	KeyRef   string `json:"jwt,omitempty"`
 }

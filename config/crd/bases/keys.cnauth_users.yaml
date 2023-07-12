@@ -37,11 +37,11 @@ spec:
             properties:
               jwt:
                 type: string
-              name:
+              password:
+                type: string
+              username:
                 description: Foo is an example field of User. Edit user_types.go to
                   remove/update
-                type: string
-              password:
                 type: string
             type: object
           status:

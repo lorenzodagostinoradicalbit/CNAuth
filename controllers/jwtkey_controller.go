@@ -63,6 +63,7 @@ func (r *JWTKeyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 
 	// Simply set the status key as the Spec key
 	key.Status.Key = key.Spec.Key
+	r.Status().Update(ctx, key)
 
 	return ctrl.Result{}, nil
 }

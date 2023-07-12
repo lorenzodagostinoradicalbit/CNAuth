@@ -18,13 +18,17 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
+	"github.com/golang-jwt/jwt/v4"
+	"github.com/lorenzodagostinoradicalbit/CNAuth/api/v1alpha1"
 	keysv1alpha1 "github.com/lorenzodagostinoradicalbit/CNAuth/api/v1alpha1"
 )
 
@@ -63,8 +67,43 @@ func (r *UserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 
 	// Fetch the JWTKey
 	RequestedKey := user.Spec.KeyRef
+	jwtKeyObj := &keysv1alpha1.JWTKey{}
+	jwtNsName := types.NamespacedName{
+		Namespace: req.NamespacedName.Namespace,
+		Name:      RequestedKey,
+	}
+	err = r.Client.Get(ctx, jwtNsName, jwtKeyObj)
+	if err != nil {
+		logger.Error(err, "Unable to fetch jwt object")
+		return ctrl.Result{}, err
+	}
+	logger.Info("Generating JWT token")
+	jwtKey := jwtKeyObj.Status.Key
+	tokenStr, err := generateJWT(jwtKey, user)
+	logger.Info(fmt.Sprintf("Token: %s", tokenStr))
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	user.Status.Token = tokenStr
+	r.Status().Update(ctx, user)
 
 	return ctrl.Result{}, nil
+}
+
+func generateJWT(key string, user *v1alpha1.User) (string, error) {
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+
+	claims["authorized"] = true
+	claims["username"] = user.Spec.Name
+	// claims["exp"] = time.Now().Add(time.Minute * 30).Unix()
+
+	tokenString, err := token.SignedString([]byte(key))
+
+	if err != nil {
+		return "", err
+	}
+	return tokenString, nil
 }
 
 func (r *UserReconciler) getUser(ctx context.Context, req ctrl.Request) (*keysv1alpha1.User, error) {
