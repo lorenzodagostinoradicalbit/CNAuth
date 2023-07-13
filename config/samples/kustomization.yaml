@@ -2,4 +2,5 @@
 resources:
 - keys_v1alpha1_jwtkey.yaml
 - keys_v1alpha1_user.yaml
+- keys_v1alpha1_service.yaml
 #+kubebuilder:scaffold:manifestskustomizesamples

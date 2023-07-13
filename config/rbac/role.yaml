@@ -34,6 +34,32 @@ rules:
 - apiGroups:
   - keys.cnauth
   resources:
+  - services
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - keys.cnauth
+  resources:
+  - services/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - keys.cnauth
+  resources:
+  - services/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - keys.cnauth
+  resources:
   - users
   verbs:
   - create
