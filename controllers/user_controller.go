@@ -18,7 +18,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -80,7 +79,6 @@ func (r *UserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 	logger.Info("Generating JWT token")
 	jwtKey := jwtKeyObj.Status.Key
 	tokenStr, err := generateJWT(jwtKey, user)
-	logger.Info(fmt.Sprintf("Token: %s", tokenStr))
 	if err != nil {
 		return ctrl.Result{}, err
 	}

@@ -21,12 +21,14 @@ import (
 
 	appsv1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
+	"github.com/lorenzodagostinoradicalbit/CNAuth/api/v1alpha1"
 	keysv1alpha1 "github.com/lorenzodagostinoradicalbit/CNAuth/api/v1alpha1"
 )
 
@@ -54,7 +56,39 @@ func int32Ptr(i int32) *int32 { return &i }
 func (r *ServiceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 
-	deployment := &appsv1.Deployment{
+	svc := &v1alpha1.Service{}
+	deployment := &appsv1.Deployment{}
+
+	err := r.Get(ctx, req.NamespacedName, svc)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			// Handle resource deletion
+			logger.Info("Unable to find object Service. Must be deleted", "Service", req.Name)
+
+			err = r.Get(ctx, req.NamespacedName, deployment)
+			if err != nil && errors.IsNotFound(err) {
+				logger.Error(err, "Unable to find specified Deployment", "Deployment", req.Name)
+				return ctrl.Result{}, err
+			}
+			err = r.Delete(ctx, deployment)
+			if err != nil {
+				logger.Error(err, "Unable to delete Deployment", "Deployment", req.Name)
+				return ctrl.Result{}, err
+			}
+			return ctrl.Result{}, nil
+		}
+		logger.Error(err, "Failed to get Service")
+		return ctrl.Result{}, nil
+	}
+
+	err = r.Get(ctx, req.NamespacedName, deployment)
+	if err == nil {
+		// Deployment exist
+		logger.Info("Deployment exists")
+		return ctrl.Result{}, nil
+	}
+
+	deployment = &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      req.Name,
 			Namespace: req.Namespace,
@@ -85,7 +119,7 @@ func (r *ServiceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	logger.Info("Creating Deployment")
-	err := r.Client.Create(ctx, deployment)
+	err = r.Client.Create(ctx, deployment)
 	if err != nil {
 		logger.Error(err, "error creating deployment")
 		return ctrl.Result{}, err
